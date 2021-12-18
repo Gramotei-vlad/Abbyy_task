@@ -177,10 +177,11 @@ class TrainLoop:
             recall = class_metrics['recall']
             f1 = class_metrics['f1 score']
 
-            wandb.tensorflow.log(tf.summary.scalar(f'{prefix} loss', loss_metric.result(), step=step))
-            wandb.tensorflow.log(tf.summary.scalar(f'{prefix} precision score', precision, step=step))
-            wandb.tensorflow.log(tf.summary.scalar(f'{prefix} recall score', recall, step=step))
-            wandb.tensorflow.log(tf.summary.scalar(f'{prefix} f1 score', f1, step=step))
+            wandb.log({f'{prefix} loss': loss_metric.result(),
+                       f'{prefix} precision score': precision,
+                       f'{prefix} recall score': recall,
+                       f'{prefix} f1 score': f1},
+                      step=step)
 
             loss_metric.reset_states()
 

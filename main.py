@@ -20,6 +20,8 @@ ANOTHER_CLASS_NAME = 'O'
 EMBEDDING_DIM = 300
 PAD_TOKEN = 'PAD_TOKEN'
 
+# ИСПРАВЬ WANDB
+
 
 if __name__ == '__main__':
 
@@ -157,3 +159,4 @@ if __name__ == '__main__':
         train_loop.test_model(test_data)
     else:
         train_loop.run(train_data, val_data)
+        train_loop.test_model(test_data)
