@@ -1,6 +1,5 @@
 typing==3.7.4.3
 pathlib==1.0.1
-numpy==1.21.2
 pytest==6.2.5
 tensorflow==2.6.0
 keras==2.6.0
