@@ -61,15 +61,16 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    wandb.init(project="Abbyy_task", entity="v-kosukhin",
-               config={
-                   'use_class_weights': args.use_class_weights,
-                   'learning rate': args.lr,
-                   'batch size': args.batch_size,
-                   'use focal loss': args.use_focal,
-                   'epochs': args.epochs,
-                   'lstm hidden size': args.lstm_hidden_size,
-               })
+    if not args.inference:
+        wandb.init(project="Abbyy_task", entity="v-kosukhin",
+                   config={
+                       'use_class_weights': args.use_class_weights,
+                       'learning rate': args.lr,
+                       'batch size': args.batch_size,
+                       'use focal loss': args.use_focal,
+                       'epochs': args.epochs,
+                       'lstm hidden size': args.lstm_hidden_size,
+                       })
 
     if args.use_focal and args.use_class_weights:
         raise ValueError(f"Focal loss doesn't use class weights")
