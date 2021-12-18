@@ -68,7 +68,7 @@ class TrainLoop:
         """
 
         def to_weights(predicted_classes):
-            weights = [self.class_weights[class_.numpy()] for class_ in predicted_classes]
+            weights = [self.class_weights[int(class_.numpy())] for class_ in predicted_classes]
             weights = tf.convert_to_tensor(weights, tf.float32)
             return weights
 
