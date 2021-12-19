@@ -120,7 +120,7 @@ class TrainLoop:
             -> Tuple[List[List[str]], List[List[str]], List[List[str]]]:
         """
         Выполняет один шаг обучения
-        :param words_batch: [batch_size, sentence_len, embeddings_dim] батч с эмбеддингами
+        :param words_batch: [batch_size, sentence_len, embeddings_dim] батч со словами
         :param labels_batch: [batch_size, sentence_len] батч меток;
         :return: word_sentences - [batch_size, sentence_len] - список слов;
                  real_classes - [batch_size, sentence_len] - список реальных классов;
@@ -238,3 +238,23 @@ class TrainLoop:
             test_labels.extend(predicted_classes)
 
         print(classification_report(test_labels, test_predictions))
+
+    def predict(self, predict_string: str):
+        """
+        Для данной строки выдает предсказания
+        :param predict_string: Исходная строка
+        :return:
+        """
+        predict_list = predict_string.split()
+
+        tensor_string = tf.convert_to_tensor(predict_list)
+        tensor_string = tf.expand_dims(tensor_string, axis=0)
+        embedding_string = get_fasttext_embeddings(self.fasttext_model, tensor_string)
+        logits = self.model(embedding_string)[self.output_signature_name]
+
+        curr_predicted = self._get_predictions(logits)
+        curr_predicted = curr_predicted.numpy()
+        predicted_classes = entity_to_string(curr_predicted, self.idx2label)
+
+        for word, pred_class in zip(predict_list, predicted_classes):
+            print(f'Word: {word}. Class: {pred_class}')

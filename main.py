@@ -28,15 +28,7 @@ if __name__ == '__main__':
     tf.random.set_seed(SEED)
 
     parser = argparse.ArgumentParser('Скрипт для обучения модели по распознаванию полей из платежек')
-    parser.add_argument('--dirty_text', action='store_true', default=False,
-                        help='Если истина, то текст будет вместе с символами, иначе потрет их')
-    parser.add_argument('--embedding_path', type=str, default='FastText/wiki.ru.bin',
-                        help='Путь до файла с FastText эмбеддингами.')
     parser.add_argument('--lstm_hidden_size', type=int, default=128, help='Размерность LSTM блока')
-    parser.add_argument('--embedding_output_dim', type=int, default=100,
-                        help='Размерность выхода эмбеддинг слоя.')
-    parser.add_argument('--use_bioes', action='store_true', default=False,
-                        help='Использовать ли bioes формат меток')
     parser.add_argument('--batch_size', type=int, default=32, help='Размер батча.')
     parser.add_argument('--main_metric', type=str, default='f1 score', choices=['f1 score', 'precision', 'recall'],
                         help='Название основной метрики')
@@ -56,10 +48,14 @@ if __name__ == '__main__':
     parser.add_argument('--inference_model_path', type=str, default='Model',
                         help='Путь до модели, которую нужно прогнать на тестовом сете'
                              'Параметр имеет смысл, если --inference истина')
+    parser.add_argument('--predict', action='store_true', default=False,
+                        help='Предсказание модели для строки, заданной в input')
+    parser.add_argument('--input', type=str, default='She saw Tom caught by a policeman in the park last night.',
+                        help='Строка, для которой нужно сделать предсказание')
 
     args = parser.parse_args()
 
-    if not args.inference:
+    if args.inference is False and args.predict is False:
         wandb.init(project="Abbyy_task", entity="v-kosukhin",
                    config={
                        'use_class_weights': args.use_class_weights,
@@ -71,7 +67,10 @@ if __name__ == '__main__':
                        })
 
     if args.use_focal and args.use_class_weights:
-        raise ValueError(f"Focal loss doesn't use class weights")
+        raise ValueError("Focal loss doesn't use class weights")
+
+    if args.predict and args.inference:
+        raise ValueError('Unexpected mode!')
 
     dataset = load_dataset('conll2003')
 
@@ -134,7 +133,7 @@ if __name__ == '__main__':
                                                     [args.batch_size] * (len(test_bucket_bounds) + 1),
                                                     padding_values=(PAD_TOKEN, label2idx[ANOTHER_CLASS_NAME]))
 
-    if args.inference:
+    if args.inference or args.predict:
         model = tf.saved_model.load(args.inference_model_path)
     else:
         model = NerModel(args.lstm_hidden_size, num_classes, args.output_signature_name)
@@ -158,6 +157,8 @@ if __name__ == '__main__':
 
     if args.inference:
         train_loop.test_model(test_data)
+    elif args.predict:
+        train_loop.predict(args.input)
     else:
         train_loop.run(train_data, val_data)
         train_loop.test_model(test_data)
