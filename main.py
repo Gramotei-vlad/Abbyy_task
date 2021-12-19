@@ -16,7 +16,7 @@ from fasttext.util import download_model
 BEST_MODEL_DIR = f'best_model'
 LAST_MODEL_DIR = f'last_model'
 
-ANOTHER_CLASS_NAME = 'O'
+ANOTHER_CLASS_NAME = 'PAD_TOKEN'
 EMBEDDING_DIM = 300
 PAD_TOKEN = 'PAD_TOKEN'
 
