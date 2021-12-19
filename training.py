@@ -256,5 +256,5 @@ class TrainLoop:
         curr_predicted = curr_predicted.numpy()
         predicted_classes = entity_to_string(curr_predicted, self.idx2label)
 
-        for word, pred_class in zip(predict_list, predicted_classes):
-            print(f'Word: {word}. Class: {pred_class}')
+        for word, pred_class in zip(predict_list, predicted_classes[0]):
+            print(f'Word: {word} Class: {pred_class}')
