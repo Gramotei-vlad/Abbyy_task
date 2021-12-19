@@ -169,3 +169,11 @@ Cross entropy;
 ```
    python main.py --inference --inference_model_path=<Директория с tf моделью>
 ```
+
+Получение результатов на свое строке.
+--
+Если нужно получить предсказания для собственной строки, то введите команду ниже. 
+Слова в строке должны быть разделены пробелом.
+```
+   python main.py --predict --input="She saw a cat" --inference_model_path=<Путь до модели>
+```
