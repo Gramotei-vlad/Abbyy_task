@@ -20,8 +20,6 @@ ANOTHER_CLASS_NAME = 'O'
 EMBEDDING_DIM = 300
 PAD_TOKEN = 'PAD_TOKEN'
 
-# ИСПРАВЬ WANDB
-
 
 if __name__ == '__main__':
 
@@ -150,6 +148,8 @@ if __name__ == '__main__':
         criterion = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         if args.use_class_weights:
             class_weights = get_class_weights(result_labels[0])
+
+            assert len(class_weights) == len(idx2label)
 
     train_loop = TrainLoop(model, criterion, optimizer, fasttext_model, args.epochs, class_weights,
                            idx2label, args.logs_dir, args.main_metric,

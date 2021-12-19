@@ -21,7 +21,7 @@ ALONE_PREFIX = 'S-'
 PATTERN = re.compile(f'[BIES]-')
 
 
-def get_set_of_words(sentences: List[List[str]]) -> List[str]:
+def get_set_of_words(sentences: List[List[int]]) -> List[int]:
     """
     Находит все уникальные токены из списков
     :param sentences: список из предложений, разбитых на токены;
@@ -34,7 +34,7 @@ def get_set_of_words(sentences: List[List[str]]) -> List[str]:
     return sorted(unique_words)
 
 
-def get_word_2_index_dict(unique_words: List[str]) -> Dict[str, int]:
+def get_word_2_index_dict(unique_words: List[int]) -> Dict[int, int]:
     """
     Для каждого токена генерит его уникальный индекс
     :param unique_words: множество из уникальных слов;
@@ -162,6 +162,20 @@ def get_class_weights(train_labels: List[List[int]]) -> Dict[int, float]:
     amount_labels = sum(list(amount_classes.values()))
     weights_classes = {class_label: (1 - cls_amount / amount_labels)
                        for class_label, cls_amount in sorted(amount_classes.items())}
+
+    # В данных есть метки, которые не используются.
+    not_used_classes = []
+    used_classes = list(weights_classes.keys())
+    idx = 0
+    for class_ in used_classes:
+        if class_ != idx:
+            not_used_classes.append(idx)
+            idx += 2
+        else:
+            idx += 1
+
+    for class_ in not_used_classes:
+        weights_classes[class_] = 1.
     return weights_classes
 
 
