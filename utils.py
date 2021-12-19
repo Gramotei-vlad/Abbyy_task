@@ -10,7 +10,7 @@ UNKNOWN_INDEX = 0
 PADDING_INDEX = 1
 EMBEDDING_DIM = 300
 EMBEDDING_VECTOR = [0 for _ in range(EMBEDDING_DIM)]
-ANOTHER_CLASS_NAME = 'another'
+ANOTHER_CLASS_NAME = 'PAD_TOKEN'
 EMBEDDING_PAD_TOKEN = tuple([0. for _ in range(EMBEDDING_DIM)])
 PAD_TOKEN = 'PAD_TOKEN'
 START_PREFIX = 'B-'
@@ -176,6 +176,9 @@ def get_class_weights(train_labels: List[List[int]]) -> Dict[int, float]:
 
     for class_ in not_used_classes:
         weights_classes[class_] = 1.
+
+    # Padding token
+    weights_classes[47] = 1
     return weights_classes
 
 
