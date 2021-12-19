@@ -237,4 +237,4 @@ class TrainLoop:
             test_predictions.extend(real_classes)
             test_labels.extend(predicted_classes)
 
-        classification_report(test_labels, test_predictions)
+        print(classification_report(test_labels, test_predictions))
