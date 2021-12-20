@@ -19,7 +19,7 @@ class TrainLoop:
     def __init__(self, model: Model, criterion: callable, optimizer: Optimizer, embedding_model,
                  epochs: int, class_weights: Dict[int, float], idx2label: Dict[int, str],
                  logs_dir: str, main_metric: str, input_signature_name: str, output_signature_name: str,
-                 is_fasttext: bool, **kwargs):
+                 is_bpe: bool, **kwargs):
         """
 
         :param model: модель типа tf.keras.Model
@@ -46,7 +46,7 @@ class TrainLoop:
         self.logs_dir = logs_dir
         self.input_signature_name = input_signature_name
         self.output_signature_name = output_signature_name
-        self.is_fasttext = is_fasttext
+        self.is_bpe = is_bpe
         self.mlc_write_path = kwargs.get('mlc_write_path', '')
 
         self.is_training = True
@@ -128,10 +128,10 @@ class TrainLoop:
                  real_classes - [batch_size, sentence_len] - список реальных классов;
                  predicted_classes - [batch_size, sentence_len] - список предсказанных классов
         """
-        if self.is_fasttext:
-            embeddings_batch = get_embeddings(self.embedding_model, words_batch)
-        else:
+        if self.is_bpe:
             embeddings_batch = get_bpe_embeddings(self.embedding_model, words_batch)
+        else:
+            embeddings_batch = get_embeddings(self.embedding_model, words_batch)
 
         if self.is_training:
             loss, logits = self._train_step(embeddings_batch, labels_batch)
@@ -255,8 +255,8 @@ class TrainLoop:
         tensor_string = tf.convert_to_tensor(predict_list)
         tensor_string = tf.expand_dims(tensor_string, axis=0)
 
-        if self.is_fasttext:
-            embedding_string = get_embeddings(self.embedding_model, tensor_string)
+        if self.is_bpe:
+            embedding_string = get_bpe_embeddings(self.embedding_model, tensor_string)
         else:
             embedding_string = get_embeddings(self.embedding_model, tensor_string)
 

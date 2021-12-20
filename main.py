@@ -81,7 +81,7 @@ if __name__ == '__main__':
     val_texts, val_labels = get_dataset(dataset, 'validation')
     test_texts, test_labels = get_dataset(dataset, 'test')
 
-    if args.fasttext_embedding:
+    if not args.bpe_embedding:
         download_model('en', if_exists='ignore')
         embedding_model = fasttext.load_model('cc.en.300.bin')
     else:
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     train_loop = TrainLoop(model, criterion, optimizer, embedding_model, args.epochs, class_weights,
                            idx2label, args.logs_dir, args.main_metric,
-                           args.input_signature_name, args.output_signature_name, args.fasttext_embedding,
+                           args.input_signature_name, args.output_signature_name, args.bpe_embedding,
                            mlc_write_path='')
 
     if args.inference:
