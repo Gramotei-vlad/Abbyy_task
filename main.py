@@ -38,7 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--logs_dir', type=str, default='LogsMLC',
                         help='Директория с логами для tensorboard, лучшим и последним состоянием моделей')
     parser.add_argument('--use_focal', action='store_true', default=False, help='Использовать focal loss?')
-    parser.add_argument('--fasttext_emebedding', action='store_true', default=False,
+    parser.add_argument('--bpe_embedding', action='store_true', default=False,
                         help='Использовать ли FastText embeddings или BPE')
     parser.add_argument('--use_class_weights', action='store_true', default=False,
                         help='Обучать ли модель с весами классов?')
