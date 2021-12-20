@@ -9,7 +9,7 @@ from tensorflow.python.framework.ops import Tensor
 
 UNKNOWN_INDEX = 0
 PADDING_INDEX = 1
-EMBEDDING_DIM = 300
+EMBEDDING_DIM = 200
 EMBEDDING_VECTOR = [0 for _ in range(EMBEDDING_DIM)]
 ANOTHER_CLASS_NAME = 'PAD_TOKEN'
 EMBEDDING_PAD_TOKEN = tuple([0. for _ in range(EMBEDDING_DIM)])
@@ -131,8 +131,6 @@ def get_bpe_embeddings(embedding_model, words_batch: Tensor):
 
     embeddings_batch = tf.convert_to_tensor(embeddings_batch, dtype=tf.float32)
     return embeddings_batch
-
-
 
 
 def bytes_to_words(bytes_batch: Tensor) -> List[List[str]]:
