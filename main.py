@@ -85,7 +85,7 @@ if __name__ == '__main__':
         download_model('en', if_exists='ignore')
         embedding_model = fasttext.load_model('cc.en.300.bin')
     else:
-        embedding_model = BytePairEmbeddings('en', dim=200)
+        embedding_model = BytePairEmbeddings('en', dim=100)
 
     full_texts = train_texts + val_texts + test_texts
     full_labels = train_labels + val_labels + test_labels
