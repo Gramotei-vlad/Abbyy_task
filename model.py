@@ -4,7 +4,7 @@ from typing import Dict
 from tensorflow.keras import layers
 from tensorflow.python.framework.ops import Tensor
 
-EMBEDDING_DIM = 300
+EMBEDDING_DIM = 200
 
 
 class NerModel(tf.keras.Model):

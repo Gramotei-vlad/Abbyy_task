@@ -3,7 +3,7 @@ import wandb
 import tensorflow as tf
 
 from typing import Tuple, Dict, List
-from utils import entity_to_string, bytes_to_words, get_fasttext_embeddings
+from utils import entity_to_string, bytes_to_words, get_embeddings, get_bpe_embeddings
 from metrics import get_metrics
 from tqdm import tqdm
 from seqeval.metrics import classification_report
@@ -16,15 +16,16 @@ LAST_MODEL_DIR = f'last_model'
 
 
 class TrainLoop:
-    def __init__(self, model: Model, criterion: callable, optimizer: Optimizer, fasttext_model,
+    def __init__(self, model: Model, criterion: callable, optimizer: Optimizer, embedding_model,
                  epochs: int, class_weights: Dict[int, float], idx2label: Dict[int, str],
-                 logs_dir: str, main_metric: str, input_signature_name: str, output_signature_name: str, **kwargs):
+                 logs_dir: str, main_metric: str, input_signature_name: str, output_signature_name: str,
+                 is_fasttext: bool, **kwargs):
         """
 
         :param model: модель типа tf.keras.Model
         :param criterion: функция потерь;
         :param optimizer: оптимизатор;
-        :param fasttext_model: модель для получения FastText эмбеддингов;
+        :param embedding_model: модель для получения FastText эмбеддингов;
         :param epochs: кол-во эпох обучения;
         :param class_weights: словарь вида {индекс класса: вес класса};
         :param idx2label: словарь вида {индекс класса: название класса};
@@ -37,7 +38,7 @@ class TrainLoop:
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
-        self.fasttext_model = fasttext_model
+        self.embedding_model = embedding_model
         self.epochs = epochs
         self.class_weights = class_weights
         self.main_metric = main_metric
@@ -45,6 +46,7 @@ class TrainLoop:
         self.logs_dir = logs_dir
         self.input_signature_name = input_signature_name
         self.output_signature_name = output_signature_name
+        self.is_fasttext = is_fasttext
         self.mlc_write_path = kwargs.get('mlc_write_path', '')
 
         self.is_training = True
@@ -126,7 +128,10 @@ class TrainLoop:
                  real_classes - [batch_size, sentence_len] - список реальных классов;
                  predicted_classes - [batch_size, sentence_len] - список предсказанных классов
         """
-        embeddings_batch = get_fasttext_embeddings(self.fasttext_model, words_batch)
+        if self.is_fasttext:
+            embeddings_batch = get_embeddings(self.embedding_model, words_batch)
+        else:
+            embeddings_batch = get_bpe_embeddings(self.embedding_model, words_batch)
 
         if self.is_training:
             loss, logits = self._train_step(embeddings_batch, labels_batch)
@@ -249,7 +254,12 @@ class TrainLoop:
 
         tensor_string = tf.convert_to_tensor(predict_list)
         tensor_string = tf.expand_dims(tensor_string, axis=0)
-        embedding_string = get_fasttext_embeddings(self.fasttext_model, tensor_string)
+
+        if self.is_fasttext:
+            embedding_string = get_embeddings(self.embedding_model, tensor_string)
+        else:
+            embedding_string = get_embeddings(self.embedding_model, tensor_string)
+
         logits = self.model(embedding_string)[self.output_signature_name]
 
         curr_predicted = self._get_predictions(logits)

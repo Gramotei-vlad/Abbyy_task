@@ -11,6 +11,7 @@ from training import TrainLoop
 from typing import Generator
 from datasets import load_dataset
 from fasttext.util import download_model
+from flair.embeddings import BytePairEmbeddings
 
 
 BEST_MODEL_DIR = f'best_model'
@@ -37,6 +38,8 @@ if __name__ == '__main__':
     parser.add_argument('--logs_dir', type=str, default='LogsMLC',
                         help='Директория с логами для tensorboard, лучшим и последним состоянием моделей')
     parser.add_argument('--use_focal', action='store_true', default=False, help='Использовать focal loss?')
+    parser.add_argument('--fasttext_emebedding', action='store_true', default=False,
+                        help='Использовать ли FastText embeddings или BPE')
     parser.add_argument('--use_class_weights', action='store_true', default=False,
                         help='Обучать ли модель с весами классов?')
     parser.add_argument('--input_signature_name', type=str, default='input_tokens',
@@ -78,8 +81,11 @@ if __name__ == '__main__':
     val_texts, val_labels = get_dataset(dataset, 'validation')
     test_texts, test_labels = get_dataset(dataset, 'test')
 
-    download_model('en', if_exists='ignore')
-    fasttext_model = fasttext.load_model('cc.en.300.bin')
+    if args.fasttext_embedding:
+        download_model('en', if_exists='ignore')
+        embedding_model = fasttext.load_model('cc.en.300.bin')
+    else:
+        embedding_model = BytePairEmbeddings('en', dim=200)
 
     full_texts = train_texts + val_texts + test_texts
     full_labels = train_labels + val_labels + test_labels
@@ -150,9 +156,9 @@ if __name__ == '__main__':
 
             assert len(class_weights) == len(idx2label)
 
-    train_loop = TrainLoop(model, criterion, optimizer, fasttext_model, args.epochs, class_weights,
+    train_loop = TrainLoop(model, criterion, optimizer, embedding_model, args.epochs, class_weights,
                            idx2label, args.logs_dir, args.main_metric,
-                           args.input_signature_name, args.output_signature_name,
+                           args.input_signature_name, args.output_signature_name, args.fasttext_embedding,
                            mlc_write_path='')
 
     if args.inference:

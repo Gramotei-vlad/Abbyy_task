@@ -4,6 +4,7 @@ import tensorflow as tf
 
 from collections import defaultdict
 from typing import Dict, List, Union, Tuple
+from flair.data import Sentence
 from tensorflow.python.framework.ops import Tensor
 
 UNKNOWN_INDEX = 0
@@ -81,10 +82,10 @@ def get_text_embeddings(sentence: List[str], word2embedding: Dict[str, Tuple[flo
     return embeddings
 
 
-def get_fasttext_embeddings(fasttext_model, words_batch: Tensor) -> Tensor:
+def get_embeddings(embedding_model, words_batch: Tensor) -> Tensor:
     """
     Получает ембеддинги для слов в тензоре
-    :param fasttext_model: модель из модуля fasttext
+    :param embedding_model: модель из модуля fasttext
     :param words_batch: тензор тензоров из слов;
     :return: тензор вида [batch_dim, sentence_len, embedding_dim]
     """
@@ -97,12 +98,41 @@ def get_fasttext_embeddings(fasttext_model, words_batch: Tensor) -> Tensor:
             if real_word == PAD_TOKEN:
                 embedding = EMBEDDING_VECTOR
             else:
-                embedding = fasttext_model.get_word_vector(real_word)
+                embedding = embedding_model.get_word_vector(real_word)
 
             sentence_embeddings.append(embedding)
         embeddings_batch.append(sentence_embeddings)
     embeddings_batch = tf.convert_to_tensor(embeddings_batch, dtype=tf.float32)
     return embeddings_batch
+
+
+def get_bpe_embeddings(embedding_model, words_batch: Tensor):
+    words_batch = words_batch.numpy()
+    embeddings_batch = []
+    for sentence in words_batch:
+        sentence_embeddings = []
+        real_sentence = []
+        for word in sentence:
+            real_word = tf.compat.as_str_any(word)
+            real_sentence.append(real_word)
+
+        sentence = Sentence(real_sentence)
+
+        embedding_model.embed(sentence)
+
+        for token in sentence:
+            if token == PAD_TOKEN:
+                sentence_embeddings.append(EMBEDDING_VECTOR)
+            else:
+                list_embedding = token.embedding.numpy().tolist()
+                sentence_embeddings.append(list_embedding)
+
+        embeddings_batch.append(sentence_embeddings)
+
+    embeddings_batch = tf.convert_to_tensor(embeddings_batch, dtype=tf.float32)
+    return embeddings_batch
+
+
 
 
 def bytes_to_words(bytes_batch: Tensor) -> List[List[str]]:
