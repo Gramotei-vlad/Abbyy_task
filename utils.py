@@ -121,7 +121,7 @@ def get_bpe_embeddings(embedding_model, words_batch: Tensor):
         embedding_model.embed(sentence)
 
         for token in sentence:
-            if token == PAD_TOKEN:
+            if token.text == PAD_TOKEN:
                 sentence_embeddings.append(EMBEDDING_VECTOR)
             else:
                 list_embedding = token.embedding.numpy().tolist()
