@@ -85,7 +85,7 @@ class TrainLoop:
             :param embeddings_batch: тензор из эмбеддингов слов для входа модели;
             :param labels_batch: тензор из реальных классов каждого токена;
             :return: кортеж из лосса и выходных логитов;
-            """
+        """
         with tf.GradientTape() as tape:
             logits = self.model(embeddings_batch)[self.output_signature_name]
 

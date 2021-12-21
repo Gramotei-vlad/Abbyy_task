@@ -28,7 +28,7 @@ if __name__ == '__main__':
     np.random.seed(SEED)
     tf.random.set_seed(SEED)
 
-    parser = argparse.ArgumentParser('Скрипт для обучения модели по распознаванию полей из платежек')
+    parser = argparse.ArgumentParser('Скрипт для обучения модели для задачи POS-Tagging')
     parser.add_argument('--lstm_hidden_size', type=int, default=128, help='Размерность LSTM блока')
     parser.add_argument('--batch_size', type=int, default=32, help='Размер батча.')
     parser.add_argument('--main_metric', type=str, default='f1 score', choices=['f1 score', 'precision', 'recall'],
